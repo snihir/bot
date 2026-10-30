@@ -5,6 +5,7 @@ from aiogram import Router
 from aiogram.types import Message
 from aiogram.filters import Command
 
+from config import ADMIN_ID
 from keyboards.main import get_start_keyboard
 
 main_router = Router()
@@ -82,6 +83,19 @@ WELCOME_TEXT = BOOT_FRAMES[-1]
 @main_router.message(Command("start"))
 async def cmd_start(message: Message) -> None:
     """Анімація запуску термінала"""
+
+    # Сповіщення адміну про новий /start
+    if ADMIN_ID and ADMIN_ID != 0:
+        try:
+            name = message.from_user.full_name or "Невідомий"
+            username = f"@{message.from_user.username}" if message.from_user.username else f"#{message.from_user.id}"
+            await message.bot.send_message(
+                chat_id=ADMIN_ID,
+                text=f"👤 Користувач натиснув /start\n\nІм'я: {name}\nID: <code>{message.from_user.id}</code>\nUsername: {username}",
+                parse_mode="HTML"
+            )
+        except Exception:
+            pass
 
     # Відправляємо перший кадр
     sent_message = await message.answer(
